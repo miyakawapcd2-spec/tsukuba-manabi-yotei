@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>つくば研究学園 学びの予定</title>
+<style>
+/* 月ごとの縦の予定表。左に日付、右にその日の予定。やめた予定は斜線のまま残す */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+:root {
+  --bg: #f3f5f8;
+  --surface: #ffffff;
+  --fg: #1c2430;
+  --muted: #536070;
+  --line: #d8dee7;
+  --accent: #1958a0;
+  --sat: #1958a0;
+  --sun: #c03333;
+  --past: #7e8b9b;
+  --cat-ort: #3f44b0;   --cat-ort-bg: #eaedfc;
+  --cat-ai: #9c5500;    --cat-ai-bg: #fff1da;
+  --cat-safe: #19733e;  --cat-safe-bg: #e0f4e8;
+  --cat-kouza: #1958a0; --cat-kouza-bg: #e1eefb;
+  --cat-dead: #ab1f1f;  --cat-dead-bg: #fde6e6;
+  --cat-mile: #723696;  --cat-mile-bg: #f2e5f9;
+  --cat-ev: #444f5e;    --cat-ev-bg: #eceff4;
+  --check: #855500;     --check-bg: #fff1cc;
+  --btn-bg: #1f5fa8;
+  --btn-fg: #ffffff;
+  --btn-hover: #164b88;
+  --btn-border: #1a5293;
+  --font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Hiragino Sans", "Yu Gothic", "Meiryo", sans-serif;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #11161d;
+    --surface: #19202a;
+    --fg: #e6ebf2;
+    --muted: #a3b0c2;
+    --line: #2e3948;
+    --accent: #82b4ef;
+    --sat: #82b4ef;
+    --sun: #f28d8d;
+    --past: #6d7b8e;
+    --cat-ort: #b8baff;   --cat-ort-bg: #262a52;
+    --cat-ai: #f5c47e;    --cat-ai-bg: #3c2c15;
+    --cat-safe: #8cdba9;  --cat-safe-bg: #173625;
+    --cat-kouza: #92bff4; --cat-kouza-bg: #192c43;
+    --cat-dead: #f59f9f;  --cat-dead-bg: #3f1b1b;
+    --cat-mile: #d9abf2;  --cat-mile-bg: #331e40;
+    --cat-ev: #bdc7d4;    --cat-ev-bg: #272f3a;
+    --check: #f5d17e;     --check-bg: #3c3013;
+    --btn-bg: #2762a8;
+    --btn-fg: #ffffff;
+    --btn-hover: #3676c6;
+    --btn-border: #4a84cb;
+    color-scheme: dark;
+  }
+}
+
+:root[data-theme="dark"] {
+  --bg: #11161d;
+  --surface: #19202a;
+  --fg: #e6ebf2;
+  --muted: #a3b0c2;
+  --line: #2e3948;
+  --accent: #82b4ef;
+  --sat: #82b4ef;
+  --sun: #f28d8d;
+  --past: #6d7b8e;
+  --cat-ort: #b8baff;   --cat-ort-bg: #262a52;
+  --cat-ai: #f5c47e;    --cat-ai-bg: #3c2c15;
+  --cat-safe: #8cdba9;  --cat-safe-bg: #173625;
+  --cat-kouza: #92bff4; --cat-kouza-bg: #192c43;
+  --cat-dead: #f59f9f;  --cat-dead-bg: #3f1b1b;
+  --cat-mile: #d9abf2;  --cat-mile-bg: #331e40;
+  --cat-ev: #bdc7d4;    --cat-ev-bg: #272f3a;
+  --check: #f5d17e;     --check-bg: #3c3013;
+  --btn-bg: #2762a8;
+  --btn-fg: #ffffff;
+  --btn-hover: #3676c6;
+  --btn-border: #4a84cb;
+  color-scheme: dark;
+}
+
+html {
+  font-size: 16px;
+  overflow-x: hidden;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-family);
+  font-size: 16px;
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+
+.wrap {
+  width: 100%;
+  max-width: 860px;
+  margin: 0 auto;
+  padding-inline: 16px;
+  padding-block: 28px 56px;
+  display: grid;
+  gap: 24px;
+}
+
+header {
+  display: grid;
+  gap: 6px;
+}
+
+.base {
+  font-size: 13px;
+  color: var(--muted);
+  letter-spacing: .06em;
+}
+
+h1 {
+  font-family: var(--font-family);
+  font-weight: 800;
+  font-size: clamp(24px, 5vw, 32px);
+  line-height: 1.3;
+  margin: 0;
+  word-break: break-word;
+}
+
+.meta {
+  font-size: 13px;
+  color: var(--muted);
+}
+
+/* フォルダへのリンクボタン */
+.links-section {
+  display: grid;
+  gap: 8px;
+}
+
+.links-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.btn-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 10px 16px;
+  background: var(--btn-bg);
+  color: var(--btn-fg);
+  border: 1px solid var(--btn-border);
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 700;
+  text-decoration: none;
+  line-height: 1.3;
+  text-align: center;
+  word-break: break-word;
+  transition: background-color .15s ease, opacity .15s ease;
+  box-sizing: border-box;
+}
+
+.btn-link:hover, .btn-link:focus-visible {
+  background: var(--btn-hover);
+  text-decoration: underline;
+}
+
+.links-note {
+  margin: 0;
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.4;
+}
+
+/* 次の予定 */
+.next {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 16px 18px;
+  display: grid;
+  gap: 6px;
+}
+
+.next-label {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--accent);
+  letter-spacing: .08em;
+}
+
+.next-body {
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1.4;
+  word-break: break-word;
+}
+
+.next-sub {
+  font-size: 14px;
+  color: var(--muted);
+}
+
+/* 凡例 */
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  font-size: 13px;
+  color: var(--muted);
+  align-items: center;
+}
+
+.legend .strike-sample {
+  text-decoration: line-through;
+}
+
+/* 月別セクション */
+section.month {
+  display: grid;
+  gap: 10px;
+}
+
+h2 {
+  font-family: var(--font-family);
+  font-weight: 700;
+  font-size: 20px;
+  margin: 0;
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+
+h2 .count {
+  font-family: var(--font-family);
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--muted);
+}
+
+.days {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.day {
+  display: grid;
+  grid-template-columns: 76px minmax(0, 1fr);
+  border-top: 1px solid var(--line);
+}
+
+.day:first-child {
+  border-top: none;
+}
+
+.date {
+  padding: 12px 4px 12px 14px;
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  font-size: 17px;
+  line-height: 1.3;
+}
+
+.date .wd {
+  display: block;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--muted);
+}
+
+.day.sat .wd {
+  color: var(--sat);
+}
+
+.day.sun .wd {
+  color: var(--sun);
+}
+
+.day.today {
+  box-shadow: inset 4px 0 0 var(--accent);
+  background-color: rgba(25, 88, 160, 0.04);
+}
+
+.day.today .date::after {
+  content: "今日";
+  display: inline-block;
+  margin-top: 4px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.day.past {
+  color: var(--past);
+}
+
+.day.past .wd {
+  color: var(--past);
+}
+
+.day.past .what .title {
+  color: var(--past);
+}
+
+.day.past .time {
+  color: var(--past);
+}
+
+.day.past .tag {
+  color: var(--past);
+  background: transparent;
+  border: 1px solid var(--line);
+}
+
+.events {
+  list-style: none;
+  margin: 0;
+  padding: 10px 14px 10px 4px;
+  display: grid;
+  gap: 10px;
+  min-width: 0;
+}
+
+.ev {
+  display: grid;
+  grid-template-columns: 8em minmax(0, 1fr);
+  gap: 2px 10px;
+  align-items: baseline;
+  min-width: 0;
+}
+
+.ev .tag {
+  justify-self: start;
+}
+
+.tag {
+  font-size: 12px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 4px;
+  white-space: nowrap;
+}
+
+.t-ort { color: var(--cat-ort); background: var(--cat-ort-bg); }
+.t-ai { color: var(--cat-ai); background: var(--cat-ai-bg); }
+.t-safe { color: var(--cat-safe); background: var(--cat-safe-bg); }
+.t-kouza { color: var(--cat-kouza); background: var(--cat-kouza-bg); }
+.t-dead { color: var(--cat-dead); background: var(--cat-dead-bg); }
+.t-mile { color: var(--cat-mile); background: var(--cat-mile-bg); }
+.t-ev { color: var(--cat-ev); background: var(--cat-ev-bg); }
+
+.what {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.time {
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  font-size: 15px;
+  margin-right: 6px;
+}
+
+.title {
+  font-size: 16px;
+  line-height: 1.45;
+}
+
+.check, .check-sample {
+  display: inline-block;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--check);
+  background: var(--check-bg);
+  padding: 2px 6px;
+  border-radius: 4px;
+  white-space: nowrap;
+}
+
+.check {
+  margin-left: 6px;
+}
+
+.ev.omitted .what .title, .ev.omitted .time {
+  text-decoration: line-through;
+  text-decoration-thickness: 2px;
+  color: var(--muted);
+}
+
+.ev.omitted .tag {
+  opacity: .55;
+}
+
+.reason {
+  grid-column: 2;
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.4;
+  margin-top: 2px;
+}
+
+footer {
+  font-size: 13px;
+  color: var(--muted);
+  display: grid;
+  gap: 6px;
+  border-top: 1px solid var(--line);
+  padding-top: 16px;
+}
+
+footer ul {
+  margin: 0;
+  padding-left: 1.2em;
+}
+
+@media (max-width: 480px) {
+  .wrap {
+    padding-inline: 12px;
+  }
+  .links-list {
+    flex-direction: column;
+  }
+  .btn-link {
+    width: 100%;
+  }
+  .day {
+    grid-template-columns: 58px minmax(0, 1fr);
+  }
+  .date {
+    padding-left: 8px;
+    font-size: 16px;
+  }
+  .ev {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 4px;
+  }
+  .reason {
+    grid-column: 1;
+  }
+}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <div class="base" id="base"></div>
+    <h1>学びの予定</h1>
+    <div class="meta" id="meta"></div>
+  </header>
+
+  <nav class="links-section" aria-label="共有フォルダ">
+    <div class="links-list" id="linksList"></div>
+    <p class="links-note">※会社のGoogleアカウントで開いてください</p>
+  </nav>
+
+  <div class="next" id="next" hidden>
+    <div class="next-label">次の予定</div>
+    <div class="next-body" id="nextBody"></div>
+    <div class="next-sub" id="nextSub"></div>
+  </div>
+
+  <div class="legend">
+    <span><span class="tag t-ort">オリエン</span> 受講前オリエンテーション</span>
+    <span><span class="strike-sample">斜線</span> ＝ やめた予定（理由つき）</span>
+    <span><span class="check-sample">確認中</span> ＝ 9月時点の情報。変わっている可能性あり</span>
+  </div>
+
+  <div id="months"></div>
+
+  <footer>
+    <div>この表に入っていないもの</div>
+    <ul id="notIncluded"></ul>
+  </footer>
+</div>
+
+<script>
+const META = {"base":"SLMCつくば研究学園BASE（1129）","updated":"2026-10-07","notIncluded":["生成AI体験会の12月以降の日程（10/2時点で未定）","2027年2月以降の講座日程（10/5 第一期の延期の影響を確かめていないため）"]};
+const EVENTS = [{"date":"2026-10-10","start":null,"end":null,"title":"受講前オリエンテーション 2回目（第一期の最終）","category":"オリエン","omitted":true,"omitReason":"対象の方がまだ1回目を受けていないため","check":false},{"date":"2026-10-11","start":null,"end":null,"title":"受講前オリエンテーション 2回目（第一期の最終）","category":"オリエン","omitted":true,"omitReason":"対象の方がまだ1回目を受けていないため","check":false},{"date":"2026-10-10","start":"14:00","end":"15:30","title":"生成AI体験会","category":"生成AI体験会","omitted":false,"omitReason":"","check":false},{"date":"2026-10-10","start":"15:45","end":"17:00","title":"安全講習（拠点開催）","category":"安全講習（拠点開催）","omitted":false,"omitReason":"","check":false},{"date":"2026-10-10","start":"10:30","end":"12:00","title":"必要論 入門・紹介編（10/10土・11日）── 第一期開講前の最終回","category":"講座","omitted":false,"omitReason":"","check":true},{"date":"2026-10-24","start":"14:00","end":"15:30","title":"生成AI体験会","category":"生成AI体験会","omitted":false,"omitReason":"","check":false},{"date":"2026-10-24","start":"15:45","end":"17:00","title":"安全講習（拠点開催）","category":"安全講習（拠点開催）","omitted":false,"omitReason":"","check":false},{"date":"2026-10-24","start":null,"end":null,"title":"講習説明会（隔月開催・要事前予約）","category":"イベント","omitted":false,"omitReason":"","check":true},{"date":"2026-10-31","start":null,"end":null,"title":"必要論 本講座 受注完了の目安（2月開講の3か月前）","category":"締切","omitted":false,"omitReason":"","check":true},{"date":"2026-10-31","start":"10:00","end":"13:00","title":"前もってセミナー 入門編（開場9:30）","category":"講座","omitted":false,"omitReason":"","check":true},{"date":"2026-11-01","start":null,"end":null,"title":"第二期 申込受付 開始","category":"節目","omitted":false,"omitReason":"","check":true},{"date":"2026-11-01","start":null,"end":null,"title":"必要論 本講座 申込期間（原本「申込期間 11月1日まで」）","category":"締切","omitted":false,"omitReason":"","check":true},{"date":"2026-11-07","start":null,"end":null,"title":"受講前オリエンテーション 1回目","category":"オリエン","omitted":false,"omitReason":"","check":false},{"date":"2026-11-08","start":null,"end":null,"title":"受講前オリエンテーション 1回目","category":"オリエン","omitted":false,"omitReason":"","check":false},{"date":"2026-11-14","start":null,"end":null,"title":"受講前オリエンテーション 2回目","category":"オリエン","omitted":true,"omitReason":"生成AI体験会と同じ日なので、日曜だけにしたため","check":false},{"date":"2026-11-14","start":"14:00","end":"15:30","title":"生成AI体験会","category":"生成AI体験会","omitted":false,"omitReason":"","check":false},{"date":"2026-11-14","start":"15:45","end":"17:00","title":"安全講習（拠点開催）","category":"安全講習（拠点開催）","omitted":false,"omitReason":"","check":false},{"date":"2026-11-15","start":null,"end":null,"title":"受講前オリエンテーション 2回目","category":"オリエン","omitted":false,"omitReason":"","check":false},{"date":"2026-11-28","start":null,"end":null,"title":"受講前オリエンテーション 1回目","category":"オリエン","omitted":true,"omitReason":"生成AI体験会と同じ日なので、日曜だけにしたため","check":false},{"date":"2026-11-28","start":"14:00","end":"15:30","title":"生成AI体験会","category":"生成AI体験会","omitted":false,"omitReason":"","check":false},{"date":"2026-11-28","start":"15:45","end":"17:00","title":"安全講習（拠点開催）","category":"安全講習（拠点開催）","omitted":false,"omitReason":"","check":false},{"date":"2026-11-29","start":null,"end":null,"title":"受講前オリエンテーション 1回目","category":"オリエン","omitted":false,"omitReason":"","check":false},{"date":"2026-12-04","start":null,"end":null,"title":"スマートライフメンバーズクラブ 総合カンファレンス2026 WEEKEND（12/4〜6）","category":"イベント","omitted":false,"omitReason":"","check":true},{"date":"2026-12-05","start":null,"end":null,"title":"受講前オリエンテーション 2回目","category":"オリエン","omitted":false,"omitReason":"","check":false},{"date":"2026-12-06","start":null,"end":null,"title":"受講前オリエンテーション 2回目","category":"オリエン","omitted":false,"omitReason":"","check":false},{"date":"2026-12-12","start":null,"end":null,"title":"輝け！日本の大学生選手権2026 決勝戦 中継（要予約）","category":"イベント","omitted":false,"omitReason":"","check":true},{"date":"2026-12-19","start":null,"end":null,"title":"受講前オリエンテーション 1回目","category":"オリエン","omitted":false,"omitReason":"","check":false},{"date":"2026-12-19","start":null,"end":null,"title":"第二期 申込受付 締切","category":"締切","omitted":false,"omitReason":"","check":true},{"date":"2026-12-19","start":"10:00","end":"13:00","title":"前もってセミナー 入門編（開場9:30）","category":"講座","omitted":false,"omitReason":"","check":true},{"date":"2026-12-20","start":null,"end":null,"title":"受講前オリエンテーション 1回目","category":"オリエン","omitted":false,"omitReason":"","check":false},{"date":"2027-01-09","start":null,"end":null,"title":"受講前オリエンテーション 2回目","category":"オリエン","omitted":false,"omitReason":"","check":false},{"date":"2027-01-10","start":null,"end":null,"title":"受講前オリエンテーション 2回目","category":"オリエン","omitted":false,"omitReason":"","check":false},{"date":"2027-01-16","start":null,"end":null,"title":"受講前オリエンテーション 1回目（第二期の方向け）","category":"オリエン","omitted":false,"omitReason":"","check":false},{"date":"2027-01-17","start":null,"end":null,"title":"受講前オリエンテーション 1回目（第二期の方向け）","category":"オリエン","omitted":false,"omitReason":"","check":false},{"date":"2027-01-23","start":"13:00","end":"14:30","title":"第一期 講座 第1回（開講）","category":"講座","omitted":false,"omitReason":"","check":false},{"date":"2027-01-30","start":null,"end":null,"title":"受講前オリエンテーション 2回目（第二期の方向け）","category":"オリエン","omitted":false,"omitReason":"","check":false},{"date":"2027-01-31","start":null,"end":null,"title":"受講前オリエンテーション 2回目（第二期の方向け）","category":"オリエン","omitted":false,"omitReason":"","check":false}];
+const LINKS = [{"label":"SLMCつくば研究学園BASE共有フォルダ","url":"https://drive.google.com/drive/folders/1Irt-X_5miSL7pIYg00nuGZKdG44W4jgu"},{"label":"learningBOX","url":"https://drive.google.com/drive/folders/1KM36lIhisgO5JjlstVB1gTrfB6byuxPf"}];
+(function () {
+  const TAG = {
+    "オリエン": ["オリエン", "t-ort"],
+    "生成AI体験会": ["生成AI体験会", "t-ai"],
+    "安全講習（拠点開催）": ["安全講習", "t-safe"],
+    "講座": ["講座", "t-kouza"],
+    "締切": ["締切", "t-dead"],
+    "節目": ["節目", "t-mile"],
+    "イベント": ["イベント", "t-ev"]
+  };
+  const WD = ["日", "月", "火", "水", "木", "金", "土"];
+
+  // URLパラメータ（?today=YYYY-MM-DD）または日本時間の現在日
+  const params = new URLSearchParams(window.location.search);
+  const today = params.get("today") || new Intl.DateTimeFormat("sv-SE", { timeZone: "Asia/Tokyo" }).format(new Date());
+
+  document.getElementById("base").textContent = META.base;
+  document.getElementById("meta").textContent = "最終更新 " + META.updated.replace(/^(\d+)-0?(\d+)-0?(\d+)$/, "$1年$2月$3日");
+
+  // リンクボタンの描画
+  const linksList = document.getElementById("linksList");
+  if (linksList && typeof LINKS !== "undefined" && Array.isArray(LINKS)) {
+    LINKS.forEach(link => {
+      const a = document.createElement("a");
+      a.className = "btn-link";
+      a.href = link.url;
+      a.target = "_blank";
+      a.rel = "noopener";
+      a.textContent = link.label;
+      linksList.appendChild(a);
+    });
+  }
+
+  const ni = document.getElementById("notIncluded");
+  META.notIncluded.forEach(t => {
+    const li = document.createElement("li");
+    li.textContent = t;
+    ni.appendChild(li);
+  });
+
+  // 日付順・同日内は開始時刻順にソート（nullは末尾）
+  const evs = EVENTS.slice().sort((a, b) => {
+    if (a.date !== b.date) return a.date.localeCompare(b.date);
+    const aStart = a.start || "99:99";
+    const bStart = b.start || "99:99";
+    if (aStart !== bStart) return aStart.localeCompare(bStart);
+    return 0;
+  });
+
+  // 次の予定（今日以降・やめていないもの）
+  const nxt = evs.find(e => e.date >= today && !e.omitted);
+  if (nxt) {
+    // 日付の文字列（日本の日付）から、端末の時間帯に関係なく月・日・曜日を出す（UTCの0時として扱い getUTC* で読む）
+    const d = new Date(nxt.date + "T00:00:00Z");
+    const md = (d.getUTCMonth() + 1) + "/" + d.getUTCDate() + "（" + WD[d.getUTCDay()] + "）";
+    const sameDay = evs.filter(e => e.date === nxt.date && !e.omitted);
+    document.getElementById("nextBody").textContent = md + "　" + nxt.title + (nxt.start ? "　" + nxt.start + "〜" + (nxt.end || "") : "");
+    const days = Math.round((d - new Date(today + "T00:00:00Z")) / 86400000);
+    document.getElementById("nextSub").textContent = (days === 0 ? "今日" : days === 1 ? "明日" : "あと" + days + "日") +
+      (sameDay.length > 1 ? "　／　同じ日にあと" + (sameDay.length - 1) + "件" : "");
+    document.getElementById("next").hidden = false;
+  }
+
+  const byMonth = new Map();
+  evs.forEach(e => {
+    const m = e.date.slice(0, 7);
+    if (!byMonth.has(m)) byMonth.set(m, new Map());
+    const days = byMonth.get(m);
+    if (!days.has(e.date)) days.set(e.date, []);
+    days.get(e.date).push(e);
+  });
+
+  const root = document.getElementById("months");
+  for (const [ym, days] of byMonth) {
+    const [y, m] = ym.split("-").map(Number);
+    const sec = document.createElement("section");
+    sec.className = "month";
+    sec.id = "m" + ym.replace("-", "");
+    const h2 = document.createElement("h2");
+    const live = [...days.values()].flat().filter(e => !e.omitted).length;
+    h2.textContent = y + "年" + m + "月";
+    const c = document.createElement("span");
+    c.className = "count";
+    c.textContent = live + "件";
+    h2.appendChild(c);
+    sec.appendChild(h2);
+
+    const box = document.createElement("div");
+    box.className = "days";
+    for (const [date, list] of days) {
+      const d = new Date(date + "T00:00:00Z");
+      const wd = d.getUTCDay();
+      const row = document.createElement("div");
+      row.className = "day" + (wd === 6 ? " sat" : wd === 0 ? " sun" : "") + (date === today ? " today" : date < today ? " past" : "");
+      const dc = document.createElement("div");
+      dc.className = "date";
+      dc.textContent = m + "/" + d.getUTCDate();
+      const w = document.createElement("span");
+      w.className = "wd";
+      w.textContent = WD[wd] + "曜";
+      dc.appendChild(w);
+      row.appendChild(dc);
+
+      const ul = document.createElement("ul");
+      ul.className = "events";
+      for (const e of list) {
+        const li = document.createElement("li");
+        li.className = "ev" + (e.omitted ? " omitted" : "");
+        const [label, cls] = TAG[e.category] || [e.category, "t-ev"];
+        const tag = document.createElement("span");
+        tag.className = "tag " + cls;
+        tag.textContent = label;
+        li.appendChild(tag);
+
+        const what = document.createElement("div");
+        what.className = "what";
+        if (e.start) {
+          const t = document.createElement("span");
+          t.className = "time";
+          t.textContent = e.start + "〜" + (e.end || "");
+          what.appendChild(t);
+        }
+        const ti = document.createElement("span");
+        ti.className = "title";
+        ti.textContent = e.title;
+        what.appendChild(ti);
+        if (e.check) {
+          const k = document.createElement("span");
+          k.className = "check";
+          k.textContent = "確認中";
+          what.appendChild(k);
+        }
+        li.appendChild(what);
+
+        if (e.omitted && e.omitReason) {
+          const r = document.createElement("div");
+          r.className = "reason";
+          r.textContent = "やめた理由：" + e.omitReason;
+          li.appendChild(r);
+        }
+        ul.appendChild(li);
+      }
+      row.appendChild(ul);
+      box.appendChild(row);
+    }
+    sec.appendChild(box);
+    root.appendChild(sec);
+  }
+})();
+</script>
+</body>
+</html>
