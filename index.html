@@ -28,6 +28,7 @@
   --cat-mile: #723696;  --cat-mile-bg: #f2e5f9;
   --cat-ev: #444f5e;    --cat-ev-bg: #eceff4;
   --cat-lb: #0e6a66;    --cat-lb-bg: #dcf2f0;
+  --cat-lec: #8a3b12;   --cat-lec-bg: #fbe9df;
   --check: #855500;     --check-bg: #fff1cc;
   --btn-bg: #1f5fa8;
   --btn-fg: #ffffff;
@@ -55,6 +56,7 @@
     --cat-mile: #d9abf2;  --cat-mile-bg: #331e40;
     --cat-ev: #bdc7d4;    --cat-ev-bg: #272f3a;
     --cat-lb: #84d8d0;    --cat-lb-bg: #15322f;
+    --cat-lec: #f2b48f;   --cat-lec-bg: #3a2116;
     --check: #f5d17e;     --check-bg: #3c3013;
     --btn-bg: #2762a8;
     --btn-fg: #ffffff;
@@ -82,6 +84,7 @@
   --cat-mile: #d9abf2;  --cat-mile-bg: #331e40;
   --cat-ev: #bdc7d4;    --cat-ev-bg: #272f3a;
   --cat-lb: #84d8d0;    --cat-lb-bg: #15322f;
+  --cat-lec: #f2b48f;   --cat-lec-bg: #3a2116;
   --check: #f5d17e;     --check-bg: #3c3013;
   --btn-bg: #2762a8;
   --btn-fg: #ffffff;
@@ -271,6 +274,17 @@ h1 {
 .nb-sub { font-size: 13px; color: var(--muted); font-variant-numeric: tabular-nums; }
 .nb-box.none .nb-date { font-size: 16px; color: var(--muted); font-weight: 400; }
 
+/* 基礎編の受講の流れ（申込 → オリエン → 講義）を、順番がわかるように並べる */
+.flow { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr) auto minmax(0, 1fr); gap: 8px; align-items: stretch; }
+.flow-title { grid-column: 1 / -1; font-size: 13px; font-weight: 700; color: var(--muted); }
+.flow-arrow { align-self: center; justify-self: center; color: var(--muted); font-size: 20px; line-height: 1; }
+.nb-others { margin-top: 6px; }
+.nb-step { font-size: 12px; font-weight: 700; color: var(--muted); letter-spacing: .02em; }
+@media (max-width: 720px) {
+  .flow { grid-template-columns: minmax(0, 1fr); gap: 4px; }
+  .flow-arrow { transform: rotate(90deg); }
+}
+
 /* 凡例 */
 .legend {
   display: flex;
@@ -446,6 +460,7 @@ h2 .count {
 .t-mile { color: var(--cat-mile); background: var(--cat-mile-bg); }
 .t-ev { color: var(--cat-ev); background: var(--cat-ev-bg); }
 .t-lb { color: var(--cat-lb); background: var(--cat-lb-bg); }
+.t-lec { color: var(--cat-lec); background: var(--cat-lec-bg); }
 
 .what {
   min-width: 0;
@@ -706,6 +721,15 @@ footer ul {
   white-space: pre-wrap;
 }
 
+.modal-detail-item.has-table { grid-template-columns: minmax(0, 1fr); gap: 4px; }
+.modal-table-wrap { overflow-x: auto; }
+.modal-table { width: 100%; border-collapse: collapse; font-size: 13px; font-variant-numeric: tabular-nums; }
+.modal-table th, .modal-table td { border-bottom: 1px solid var(--line); padding: 6px 6px; text-align: right; vertical-align: top; }
+.modal-table thead th { color: var(--muted); font-size: 12px; font-weight: 700; white-space: nowrap; }
+.modal-table tbody th { text-align: left; font-weight: 700; }
+.modal-table thead th:first-child { text-align: left; }
+.modal-table td { white-space: nowrap; }
+
 .modal-sublist {
   display: grid;
   gap: 6px;
@@ -805,6 +829,8 @@ footer ul {
 
   <section class="nb" aria-labelledby="nbTitle">
     <h2 class="nb-title" id="nbTitle">項目ごとの次の日程</h2>
+    <div class="flow" id="flow"></div>
+    <div class="flow-title nb-others">そのほかの項目</div>
     <div class="nb-grid" id="nbGrid"></div>
   </section>
 
@@ -838,8 +864,8 @@ footer ul {
 <script>
 const VARIANT = "github";
 const META = {"base":"SLMCつくば研究学園BASE（1129）","updated":"2026-10-08","notIncluded":["生成AI体験会の12月以降の日程（10/2時点で未定）","2027年2月以降の講座日程（10/5 第一期の延期の影響を確かめていないため）"]};
-const EVENTS = [{"date":"2026-10-10","start":null,"end":null,"title":"受講前オリエンテーション 2回目（第一期の最終）","category":"オリエン","omitted":true,"omitReason":"対象の方がまだ1回目を受けていないため","check":false,"detail":[]},{"date":"2026-10-11","start":null,"end":null,"title":"受講前オリエンテーション 2回目（第一期の最終）","category":"オリエン","omitted":true,"omitReason":"対象の方がまだ1回目を受けていないため","check":false,"detail":[]},{"date":"2026-10-10","start":"14:00","end":"15:30","title":"生成AI体験会","category":"生成AI体験会","omitted":false,"omitReason":"","check":false,"detail":[]},{"date":"2026-10-10","start":"15:45","end":"17:00","title":"安全講習（拠点開催）","category":"安全講習（拠点開催）","omitted":false,"omitReason":"","check":false,"detail":[]},{"date":"2026-10-10","start":"10:30","end":"12:00","title":"必要論 入門・紹介編（10/10土・11日）── 第一期開講前の最終回","category":"講座","omitted":false,"omitReason":"","check":true,"detail":[{"label":"内容","text":"2027年開講予定の「スマートライフ学必要論」の入門・紹介編。デジタル格差によってなぜ最大18兆円もの損失が発生するのか、その格差を解消する指針となる学問「スマートライフ学」の必要性を探究する特別講義"},{"label":"日時","text":"10月10日（土）・11日（日）10:30〜12:00"},{"label":"講師","text":"野島 隆久（SMARTLIFE AO校 校長／スマートライフ教育研究所 所長）"},{"label":"会場","text":"横浜会場（各日 定員100組）・オンライン（各日 定員100組）。SMART LIFE AO 茨城つくば校でも、ライブ配信でご覧いただけます"},{"label":"対象","text":"特別ご招待：AO校生・内定者・そのご家族"},{"label":"お問い合わせ","text":"定員枠は各AO校ごとに上限があります。詳しくは担当のプランナーにお問い合わせください"},{"label":"第一期開講前の最終回","text":"本講義をもって、第一期開講前に実施するスマートライフ学必要論講座の入門・紹介講座は、すべて終了となります"}]},{"date":"2026-10-24","start":"14:00","end":"15:30","title":"生成AI体験会","category":"生成AI体験会","omitted":false,"omitReason":"","check":false,"detail":[]},{"date":"2026-10-24","start":"15:45","end":"17:00","title":"安全講習（拠点開催）","category":"安全講習（拠点開催）","omitted":false,"omitReason":"","check":false,"detail":[]},{"date":"2026-10-24","start":null,"end":null,"title":"講習説明会（隔月開催・要事前予約）","category":"イベント","omitted":false,"omitReason":"","check":true,"detail":[]},{"date":"2026-10-31","start":null,"end":null,"title":"必要論 本講座 受注完了の目安（2月開講の3か月前）","category":"締切","omitted":false,"omitReason":"","check":true,"detail":[]},{"date":"2026-10-31","start":null,"end":null,"title":"LearningBOX 第一期（1月開講）申込締切","category":"LearningBOX","omitted":false,"omitReason":"","check":false,"detail":[{"label":"講座","text":"くらしのデジタル安全講習【基礎編】（スマートライフデザイン学入門 現代の読み書き編）。全6回の講座＋教材と機器がひとつになった「Learning BOX」"},{"label":"締切","text":"1月開講（2027年1月23日（土）開講）のお申込みは、2026年10月31日（土）まで。先着順・定員になり次第締切"},{"label":"機器","text":"選べる機器は、項目「LearningBOX」の箱を押すと出ます"}]},{"date":"2026-10-31","start":"10:00","end":"13:00","title":"前もってセミナー 入門編（開場9:30）","category":"講座","omitted":false,"omitReason":"","check":true,"detail":[]},{"date":"2026-11-01","start":null,"end":null,"title":"第二期 申込受付 開始","category":"LearningBOX","omitted":false,"omitReason":"","check":true,"detail":[]},{"date":"2026-11-01","start":null,"end":null,"title":"必要論 本講座 申込期間（原本「申込期間 11月1日まで」）","category":"締切","omitted":false,"omitReason":"","check":true,"detail":[{"label":"講座","text":"スマートライフ学必要論（The Necessity of Smart Life Studies）。全6回／年、2027年2月開講。第1回は2月27日（土）、全国アカデミア大会の前日講座。2回目以降は決まり次第ご案内します"},{"label":"内容","text":"スマートライフ学（SLS）とスマートライフデザイン学（SLD）を体系的に学びながら、暮らしの中にある小さな違和感や困りごとを、学びの問いへと変えていく講座。導入→概論→探究→共有の流れで進み、学びのゴールは「内なる羅針盤」の獲得です"},{"label":"対象","text":"中学生〜大学生とその保護者の方、社会人・子育て世代・リスキリング世代・シニア世代・教育関係者の方"},{"label":"受講料","text":"会員価格 75,000円／年（税込82,500円）、4年間 250,000円（税込275,000円）。入会・入校代は別途。履修用の機材セットもあります（2026年8月26日版の会員様用資料による）"},{"label":"会場・お申込み","text":"会場はSMARTLIFE AO校。申込期間は11月1日まで。担当のプランナーにお申し付けください"},{"label":"ご注意","text":"カリキュラムは2026年8月時点の予定です。内容は変更となる場合があります"}]},{"date":"2026-11-07","start":null,"end":null,"title":"受講前オリエンテーション 1回目","category":"オリエン","omitted":true,"omitReason":"11月は日曜だけにしたため","check":false,"detail":[]},{"date":"2026-11-08","start":null,"end":null,"title":"受講前オリエンテーション 1回目","category":"オリエン","omitted":false,"omitReason":"","check":false,"detail":[{"label":"組","text":"A組の1回目です。2回目は11月15日（日）です。講座は、1月開講の方は2027年1月23日（土）、4月開講の方は4月24日（土）からです。"},{"label":"日程","text":"時間は担当からご案内します。"}]},{"date":"2026-11-14","start":null,"end":null,"title":"受講前オリエンテーション 2回目","category":"オリエン","omitted":true,"omitReason":"生成AI体験会と同じ日なので、日曜だけにしたため","check":false,"detail":[]},{"date":"2026-11-14","start":"14:00","end":"15:30","title":"生成AI体験会","category":"生成AI体験会","omitted":false,"omitReason":"","check":false,"detail":[]},{"date":"2026-11-14","start":"15:45","end":"17:00","title":"安全講習（拠点開催）","category":"安全講習（拠点開催）","omitted":false,"omitReason":"","check":false,"detail":[]},{"date":"2026-11-15","start":null,"end":null,"title":"受講前オリエンテーション 2回目","category":"オリエン","omitted":false,"omitReason":"","check":false,"detail":[{"label":"組","text":"A組の2回目です（1回目は11月8日（日））。講座は、1月開講の方は2027年1月23日（土）、4月開講の方は4月24日（土）からです。"},{"label":"日程","text":"時間は担当からご案内します。"}]},{"date":"2026-11-28","start":null,"end":null,"title":"受講前オリエンテーション 1回目","category":"オリエン","omitted":true,"omitReason":"生成AI体験会と同じ日なので、日曜だけにしたため","check":false,"detail":[]},{"date":"2026-11-28","start":"14:00","end":"15:30","title":"生成AI体験会","category":"生成AI体験会","omitted":false,"omitReason":"","check":false,"detail":[]},{"date":"2026-11-28","start":"15:45","end":"17:00","title":"安全講習（拠点開催）","category":"安全講習（拠点開催）","omitted":false,"omitReason":"","check":false,"detail":[]},{"date":"2026-11-29","start":null,"end":null,"title":"受講前オリエンテーション 1回目","category":"オリエン","omitted":false,"omitReason":"","check":false,"detail":[{"label":"組","text":"B組の1回目です。2回目は12月5日（土）・6日（日）のどちらか1日（予定）です。講座は、1月開講の方は2027年1月23日（土）、4月開講の方は4月24日（土）からです。"},{"label":"日程","text":"時間は担当からご案内します。"}]},{"date":"2026-12-04","start":null,"end":null,"title":"スマートライフメンバーズクラブ 総合カンファレンス2026 WEEKEND（12/4〜6）","category":"イベント","omitted":false,"omitReason":"","check":true,"detail":[]},{"date":"2026-12-05","start":null,"end":null,"title":"受講前オリエンテーション 2回目","category":"オリエン","omitted":false,"omitReason":"","check":false,"detail":[{"label":"組","text":"B組の2回目です（1回目は11月29日（日））。12月5日（土）・6日（日）のどちらか1日にお越しください。講座は、1月開講の方は2027年1月23日（土）、4月開講の方は4月24日（土）からです。"},{"label":"日程","text":"この日程は予定です。決まりしだいご案内します。時間は担当からご案内します。"}]},{"date":"2026-12-06","start":null,"end":null,"title":"受講前オリエンテーション 2回目","category":"オリエン","omitted":false,"omitReason":"","check":false,"detail":[{"label":"組","text":"B組の2回目です（1回目は11月29日（日））。12月5日（土）・6日（日）のどちらか1日にお越しください。講座は、1月開講の方は2027年1月23日（土）、4月開講の方は4月24日（土）からです。"},{"label":"日程","text":"この日程は予定です。決まりしだいご案内します。時間は担当からご案内します。"}]},{"date":"2026-12-12","start":null,"end":null,"title":"輝け！日本の大学生選手権2026 決勝戦 中継（要予約）","category":"イベント","omitted":false,"omitReason":"","check":true,"detail":[]},{"date":"2026-12-19","start":null,"end":null,"title":"受講前オリエンテーション 1回目","category":"オリエン","omitted":false,"omitReason":"","check":false,"detail":[{"label":"組","text":"C組の1回目です。12月19日（土）・20日（日）のどちらか1日にお越しください。2回目は2027年1月9日（土）・10日（日）のどちらか1日（予定）です。講座は、1月開講の方は2027年1月23日（土）、4月開講の方は4月24日（土）からです。"},{"label":"日程","text":"この日程は予定です。決まりしだいご案内します。時間は担当からご案内します。"}]},{"date":"2026-12-19","start":null,"end":null,"title":"第二期 申込受付 締切","category":"LearningBOX","omitted":false,"omitReason":"","check":false,"detail":[]},{"date":"2026-12-19","start":"10:00","end":"13:00","title":"前もってセミナー 入門編（開場9:30）","category":"講座","omitted":false,"omitReason":"","check":true,"detail":[]},{"date":"2026-12-20","start":null,"end":null,"title":"受講前オリエンテーション 1回目","category":"オリエン","omitted":false,"omitReason":"","check":false,"detail":[{"label":"組","text":"C組の1回目です。12月19日（土）・20日（日）のどちらか1日にお越しください。2回目は2027年1月9日（土）・10日（日）のどちらか1日（予定）です。講座は、1月開講の方は2027年1月23日（土）、4月開講の方は4月24日（土）からです。"},{"label":"日程","text":"この日程は予定です。決まりしだいご案内します。時間は担当からご案内します。"}]},{"date":"2027-01-09","start":null,"end":null,"title":"受講前オリエンテーション 2回目","category":"オリエン","omitted":false,"omitReason":"","check":false,"detail":[{"label":"組","text":"C組の2回目です（1回目は12月19日（土）・20日（日））。1月9日（土）・10日（日）のどちらか1日にお越しください。講座は、1月開講の方は2027年1月23日（土）、4月開講の方は4月24日（土）からです。"},{"label":"日程","text":"この日程は予定です。決まりしだいご案内します。時間は担当からご案内します。"}]},{"date":"2027-01-10","start":null,"end":null,"title":"受講前オリエンテーション 2回目","category":"オリエン","omitted":false,"omitReason":"","check":false,"detail":[{"label":"組","text":"C組の2回目です（1回目は12月19日（土）・20日（日））。1月9日（土）・10日（日）のどちらか1日にお越しください。講座は、1月開講の方は2027年1月23日（土）、4月開講の方は4月24日（土）からです。"},{"label":"日程","text":"この日程は予定です。決まりしだいご案内します。時間は担当からご案内します。"}]},{"date":"2027-01-16","start":null,"end":null,"title":"受講前オリエンテーション 1回目（第二期の方向け）","category":"オリエン","omitted":false,"omitReason":"","check":false,"detail":[{"label":"組","text":"D組の1回目です（4月開講の方向け）。1月16日（土）・17日（日）のどちらか1日にお越しください。2回目は1月30日（土）・31日（日）のどちらか1日（予定）、講座は2027年4月24日（土）からです。"},{"label":"日程","text":"この日程は予定です。決まりしだいご案内します。時間は担当からご案内します。"}]},{"date":"2027-01-17","start":null,"end":null,"title":"受講前オリエンテーション 1回目（第二期の方向け）","category":"オリエン","omitted":false,"omitReason":"","check":false,"detail":[{"label":"組","text":"D組の1回目です（4月開講の方向け）。1月16日（土）・17日（日）のどちらか1日にお越しください。2回目は1月30日（土）・31日（日）のどちらか1日（予定）、講座は2027年4月24日（土）からです。"},{"label":"日程","text":"この日程は予定です。決まりしだいご案内します。時間は担当からご案内します。"}]},{"date":"2027-01-23","start":"13:00","end":"14:30","title":"第一期 講座 第1回（開講）","category":"講座","omitted":false,"omitReason":"","check":false,"detail":[{"label":"講座","text":"全6回・いずれも土曜 13:00〜14:30。2027年1月23日・3月27日・5月22日・7月24日・9月25日・11月27日"},{"label":"受講の前に","text":"講座の前に、受講前オリエンテーションを2回受けていただきます。必ず 1回目 → 2回目 → 講座 の順番でご参加ください。"},{"label":"欠席したとき","text":"欠席された回は、AO校のオンライン学習室で録画（アーカイブ）をご覧いただけます。"},{"label":"個別活用支援","text":"講座のほかに、個別活用支援（毎月1回・要事前予約）で、疑問の解決や、オリエンテーションでできなかったところを一緒に進められます。"}]},{"date":"2027-01-30","start":null,"end":null,"title":"受講前オリエンテーション 2回目（第二期の方向け）","category":"オリエン","omitted":false,"omitReason":"","check":false,"detail":[{"label":"組","text":"D組の2回目です（4月開講の方向け。1回目は1月16日（土）・17日（日））。1月30日（土）・31日（日）のどちらか1日にお越しください。講座は2027年4月24日（土）からです。"},{"label":"日程","text":"この日程は予定です。決まりしだいご案内します。時間は担当からご案内します。"}]},{"date":"2027-01-31","start":null,"end":null,"title":"受講前オリエンテーション 2回目（第二期の方向け）","category":"オリエン","omitted":false,"omitReason":"","check":false,"detail":[{"label":"組","text":"D組の2回目です（4月開講の方向け。1回目は1月16日（土）・17日（日））。1月30日（土）・31日（日）のどちらか1日にお越しください。講座は2027年4月24日（土）からです。"},{"label":"日程","text":"この日程は予定です。決まりしだいご案内します。時間は担当からご案内します。"}]}];
-const CATEGORY_INFO = {"オリエン":{"detail":[{"label":"対象","text":"くらしのデジタル安全講習【基礎編】（スマートライフデザイン学入門 現代の読み書き編）を受講される方"},{"label":"流れ","text":"講座が始まる前に、2回のオリエンテーションで準備をします。1回目は「いまの状態を書き出す」回、2回目は「新しい機器を使い始める」回です。必ず 1回目 → 2回目 → 講座 の順番でご参加ください。"},{"label":"1回目（約70分）","text":"教科書（P.1〜5）を一緒に読み、ご自身とご家庭の「いま」を書き出します。いまお使いの機器とインターネットの環境／消えては困るデータ（写真・連絡先・メール・年賀状の住所録など）と最後に保存した日／Microsoft・Apple ID・Google・LINEなどのアカウントの一覧／通信費やサブスクなど「使っていないのに払っているもの」はないか。空欄があっても大丈夫です。パスワードを書いた用紙を、会場でお預かりすることはありません。"},{"label":"1回目の持ち物","text":"いまお使いのパソコン・電源コード・ACアダプター／データ保全ユニット／アカウント情報（メールアドレスとそのパスワード）／携帯電話・インターネットのご利用プラン、携帯電話のアカウント、ご家族で契約しているサブスクの明細／筆記用具"},{"label":"1回目と2回目のあいだ","text":"当店で、新しい機器の設定とデータの移行をしておきます。1回目で空欄になったところ（とくにご家族名義の契約や明細）を、ご自宅で確かめておいてください。Wi-Fiのパスワードはルーター本体のシールに書かれていることが多いので、写真を撮っておくと確実です。"},{"label":"2回目（約2時間）","text":"教科書のつづき（P.6〜8）を読み、新しい機器を一緒に整えます。移行の確認／メールの設定（講座に含まれる「@ozzio.jp」のメール）／ウイルス対策（ウイルスバスター）／防犯アプリ（詐欺バスター）／安全ワイヤレス（SSW）／保証の確認／Safety Number（この日はご説明だけ）。設定はご自身で操作していただき、分からなくなったら担当が一緒に進めます。最後にAO校の施設を一緒に回ります。"},{"label":"2回目の持ち物","text":"教科書・履修Toolガイド・安全のしおり／1回目に書き込んだ用紙／会員登録証（メールとウイルス対策の設定に使います）／いまお使いのスマートフォン／筆記用具／（あれば）ルーターのシールの写真"},{"label":"合言葉","text":"開かない・急がない・一人で決めない"},{"label":"会場・お問い合わせ","text":"SMART LIFE AO 茨城つくば校（つくば市学園南3-16-5）029-860-6755　受付時間 10:30〜19:00（毎週水曜定休日）"}]},"生成AI体験会":{"detail":[]},"安全講習（拠点開催）":{"detail":[]},"講座":{"detail":[]},"LearningBOX":{"detail":[{"label":"選べる機器","text":"パソコン（Windows・Mac）やiPadから、ご家庭に合う機器を。設定とデータの引っ越しは当店で行います"},{"label":"11月からは","text":"4月開講（2027年4月24日（土）開講）。お申込みは2026年12月19日（土）まで"}]},"締切":{"detail":[]},"節目":{"detail":[]},"イベント":{"detail":[]}};
+const EVENTS = [{"date":"2026-10-10","start":null,"end":null,"title":"受講前オリエンテーション 2回目（第一期の最終）","category":"オリエン","omitted":true,"omitReason":"対象の方がまだ1回目を受けていないため","check":false,"detail":[]},{"date":"2026-10-11","start":null,"end":null,"title":"受講前オリエンテーション 2回目（第一期の最終）","category":"オリエン","omitted":true,"omitReason":"対象の方がまだ1回目を受けていないため","check":false,"detail":[]},{"date":"2026-10-10","start":"14:00","end":"15:30","title":"生成AI体験会","category":"生成AI体験会","omitted":false,"omitReason":"","check":false,"detail":[]},{"date":"2026-10-10","start":"15:45","end":"17:00","title":"安全講習（拠点開催）","category":"安全講習（拠点開催）","omitted":false,"omitReason":"","check":false,"detail":[]},{"date":"2026-10-10","start":"10:30","end":"12:00","title":"必要論 入門・紹介編（10/10土・11日）── 第一期開講前の最終回","category":"講座","omitted":false,"omitReason":"","check":true,"detail":[{"label":"内容","text":"2027年開講予定の「スマートライフ学必要論」の入門・紹介編。デジタル格差によってなぜ最大18兆円もの損失が発生するのか、その格差を解消する指針となる学問「スマートライフ学」の必要性を探究する特別講義"},{"label":"日時","text":"10月10日（土）・11日（日）10:30〜12:00"},{"label":"講師","text":"野島 隆久（SMARTLIFE AO校 校長／スマートライフ教育研究所 所長）"},{"label":"会場","text":"横浜会場（各日 定員100組）・オンライン（各日 定員100組）。SMART LIFE AO 茨城つくば校でも、ライブ配信でご覧いただけます"},{"label":"対象","text":"特別ご招待：AO校生・内定者・そのご家族"},{"label":"お問い合わせ","text":"定員枠は各AO校ごとに上限があります。詳しくは担当のプランナーにお問い合わせください"},{"label":"第一期開講前の最終回","text":"本講義をもって、第一期開講前に実施するスマートライフ学必要論講座の入門・紹介講座は、すべて終了となります"}]},{"date":"2026-10-24","start":"14:00","end":"15:30","title":"生成AI体験会","category":"生成AI体験会","omitted":false,"omitReason":"","check":false,"detail":[]},{"date":"2026-10-24","start":"15:45","end":"17:00","title":"安全講習（拠点開催）","category":"安全講習（拠点開催）","omitted":false,"omitReason":"","check":false,"detail":[]},{"date":"2026-10-24","start":null,"end":null,"title":"講習説明会（隔月開催・要事前予約）","category":"イベント","omitted":false,"omitReason":"","check":true,"detail":[]},{"date":"2026-10-31","start":null,"end":null,"title":"必要論 本講座 受注完了の目安（2月開講の3か月前）","category":"締切","omitted":false,"omitReason":"","check":true,"detail":[]},{"date":"2026-10-31","start":null,"end":null,"title":"LearningBOX 第一期（1月開講）申込締切","category":"LearningBOX","omitted":false,"omitReason":"","check":false,"detail":[{"label":"講座","text":"くらしのデジタル安全講習【基礎編】（スマートライフデザイン学入門 現代の読み書き編）。全6回の講座＋教材と機器がひとつになった「Learning BOX」"},{"label":"締切","text":"1月開講（2027年1月23日（土）開講）のお申込みは、2026年10月31日（土）まで。先着順・定員になり次第締切"},{"label":"機器","text":"選べる機器・含まれるものは、項目「LearningBOX」の箱を押すと出ます"}]},{"date":"2026-10-31","start":"10:00","end":"13:00","title":"前もってセミナー 入門編（開場9:30）","category":"講座","omitted":false,"omitReason":"","check":true,"detail":[]},{"date":"2026-11-01","start":null,"end":null,"title":"第二期 申込受付 開始","category":"LearningBOX","omitted":false,"omitReason":"","check":true,"detail":[]},{"date":"2026-11-01","start":null,"end":null,"title":"必要論 本講座 申込期間（原本「申込期間 11月1日まで」）","category":"締切","omitted":false,"omitReason":"","check":true,"detail":[{"label":"講座","text":"スマートライフ学必要論（The Necessity of Smart Life Studies）。全6回／年、2027年2月開講。第1回は2月27日（土）、全国アカデミア大会の前日講座。2回目以降は決まり次第ご案内します"},{"label":"内容","text":"スマートライフ学（SLS）とスマートライフデザイン学（SLD）を体系的に学びながら、暮らしの中にある小さな違和感や困りごとを、学びの問いへと変えていく講座。導入→概論→探究→共有の流れで進み、学びのゴールは「内なる羅針盤」の獲得です"},{"label":"対象","text":"中学生〜大学生とその保護者の方、社会人・子育て世代・リスキリング世代・シニア世代・教育関係者の方"},{"label":"受講料","text":"会員価格 75,000円／年（税込82,500円）、4年間 250,000円（税込275,000円）。入会・入校代は別途。履修用の機材セットもあります（2026年8月26日版の会員様用資料による）"},{"label":"会場・お申込み","text":"会場はSMARTLIFE AO校。申込期間は11月1日まで。担当のプランナーにお申し付けください"},{"label":"ご注意","text":"カリキュラムは2026年8月時点の予定です。内容は変更となる場合があります"}]},{"date":"2026-11-07","start":null,"end":null,"title":"受講前オリエンテーション 1回目","category":"オリエン","omitted":true,"omitReason":"11月は日曜だけにしたため","check":false,"detail":[]},{"date":"2026-11-08","start":null,"end":null,"title":"受講前オリエンテーション 1回目","category":"オリエン","omitted":false,"omitReason":"","check":false,"detail":[{"label":"組","text":"A組の1回目です。2回目は11月15日（日）です。講座は、1月開講の方は2027年1月23日（土）、4月開講の方は4月24日（土）からです。"},{"label":"日程","text":"時間は担当からご案内します。"}]},{"date":"2026-11-14","start":null,"end":null,"title":"受講前オリエンテーション 2回目","category":"オリエン","omitted":true,"omitReason":"生成AI体験会と同じ日なので、日曜だけにしたため","check":false,"detail":[]},{"date":"2026-11-14","start":"14:00","end":"15:30","title":"生成AI体験会","category":"生成AI体験会","omitted":false,"omitReason":"","check":false,"detail":[]},{"date":"2026-11-14","start":"15:45","end":"17:00","title":"安全講習（拠点開催）","category":"安全講習（拠点開催）","omitted":false,"omitReason":"","check":false,"detail":[]},{"date":"2026-11-15","start":null,"end":null,"title":"受講前オリエンテーション 2回目","category":"オリエン","omitted":false,"omitReason":"","check":false,"detail":[{"label":"組","text":"A組の2回目です（1回目は11月8日（日））。講座は、1月開講の方は2027年1月23日（土）、4月開講の方は4月24日（土）からです。"},{"label":"日程","text":"時間は担当からご案内します。"}]},{"date":"2026-11-28","start":null,"end":null,"title":"受講前オリエンテーション 1回目","category":"オリエン","omitted":true,"omitReason":"生成AI体験会と同じ日なので、日曜だけにしたため","check":false,"detail":[]},{"date":"2026-11-28","start":"14:00","end":"15:30","title":"生成AI体験会","category":"生成AI体験会","omitted":false,"omitReason":"","check":false,"detail":[]},{"date":"2026-11-28","start":"15:45","end":"17:00","title":"安全講習（拠点開催）","category":"安全講習（拠点開催）","omitted":false,"omitReason":"","check":false,"detail":[]},{"date":"2026-11-29","start":null,"end":null,"title":"受講前オリエンテーション 1回目","category":"オリエン","omitted":false,"omitReason":"","check":false,"detail":[{"label":"組","text":"B組の1回目です。2回目は12月5日（土）・6日（日）のどちらか1日（予定）です。講座は、1月開講の方は2027年1月23日（土）、4月開講の方は4月24日（土）からです。"},{"label":"日程","text":"時間は担当からご案内します。"}]},{"date":"2026-12-04","start":null,"end":null,"title":"スマートライフメンバーズクラブ 総合カンファレンス2026 WEEKEND（12/4〜6）","category":"イベント","omitted":false,"omitReason":"","check":true,"detail":[]},{"date":"2026-12-05","start":null,"end":null,"title":"受講前オリエンテーション 2回目","category":"オリエン","omitted":false,"omitReason":"","check":false,"detail":[{"label":"組","text":"B組の2回目です（1回目は11月29日（日））。12月5日（土）・6日（日）のどちらか1日にお越しください。講座は、1月開講の方は2027年1月23日（土）、4月開講の方は4月24日（土）からです。"},{"label":"日程","text":"この日程は予定です。決まりしだいご案内します。時間は担当からご案内します。"}]},{"date":"2026-12-06","start":null,"end":null,"title":"受講前オリエンテーション 2回目","category":"オリエン","omitted":false,"omitReason":"","check":false,"detail":[{"label":"組","text":"B組の2回目です（1回目は11月29日（日））。12月5日（土）・6日（日）のどちらか1日にお越しください。講座は、1月開講の方は2027年1月23日（土）、4月開講の方は4月24日（土）からです。"},{"label":"日程","text":"この日程は予定です。決まりしだいご案内します。時間は担当からご案内します。"}]},{"date":"2026-12-12","start":null,"end":null,"title":"輝け！日本の大学生選手権2026 決勝戦 中継（要予約）","category":"イベント","omitted":false,"omitReason":"","check":true,"detail":[]},{"date":"2026-12-19","start":null,"end":null,"title":"受講前オリエンテーション 1回目","category":"オリエン","omitted":false,"omitReason":"","check":false,"detail":[{"label":"組","text":"C組の1回目です。12月19日（土）・20日（日）のどちらか1日にお越しください。2回目は2027年1月9日（土）・10日（日）のどちらか1日（予定）です。講座は、1月開講の方は2027年1月23日（土）、4月開講の方は4月24日（土）からです。"},{"label":"日程","text":"この日程は予定です。決まりしだいご案内します。時間は担当からご案内します。"}]},{"date":"2026-12-19","start":null,"end":null,"title":"第二期 申込受付 締切","category":"LearningBOX","omitted":false,"omitReason":"","check":false,"detail":[]},{"date":"2026-12-19","start":"10:00","end":"13:00","title":"前もってセミナー 入門編（開場9:30）","category":"講座","omitted":false,"omitReason":"","check":true,"detail":[]},{"date":"2026-12-20","start":null,"end":null,"title":"受講前オリエンテーション 1回目","category":"オリエン","omitted":false,"omitReason":"","check":false,"detail":[{"label":"組","text":"C組の1回目です。12月19日（土）・20日（日）のどちらか1日にお越しください。2回目は2027年1月9日（土）・10日（日）のどちらか1日（予定）です。講座は、1月開講の方は2027年1月23日（土）、4月開講の方は4月24日（土）からです。"},{"label":"日程","text":"この日程は予定です。決まりしだいご案内します。時間は担当からご案内します。"}]},{"date":"2027-01-09","start":null,"end":null,"title":"受講前オリエンテーション 2回目","category":"オリエン","omitted":false,"omitReason":"","check":false,"detail":[{"label":"組","text":"C組の2回目です（1回目は12月19日（土）・20日（日））。1月9日（土）・10日（日）のどちらか1日にお越しください。講座は、1月開講の方は2027年1月23日（土）、4月開講の方は4月24日（土）からです。"},{"label":"日程","text":"この日程は予定です。決まりしだいご案内します。時間は担当からご案内します。"}]},{"date":"2027-01-10","start":null,"end":null,"title":"受講前オリエンテーション 2回目","category":"オリエン","omitted":false,"omitReason":"","check":false,"detail":[{"label":"組","text":"C組の2回目です（1回目は12月19日（土）・20日（日））。1月9日（土）・10日（日）のどちらか1日にお越しください。講座は、1月開講の方は2027年1月23日（土）、4月開講の方は4月24日（土）からです。"},{"label":"日程","text":"この日程は予定です。決まりしだいご案内します。時間は担当からご案内します。"}]},{"date":"2027-01-16","start":null,"end":null,"title":"受講前オリエンテーション 1回目（第二期の方向け）","category":"オリエン","omitted":false,"omitReason":"","check":false,"detail":[{"label":"組","text":"D組の1回目です（4月開講の方向け）。1月16日（土）・17日（日）のどちらか1日にお越しください。2回目は1月30日（土）・31日（日）のどちらか1日（予定）、講座は2027年4月24日（土）からです。"},{"label":"日程","text":"この日程は予定です。決まりしだいご案内します。時間は担当からご案内します。"}]},{"date":"2027-01-17","start":null,"end":null,"title":"受講前オリエンテーション 1回目（第二期の方向け）","category":"オリエン","omitted":false,"omitReason":"","check":false,"detail":[{"label":"組","text":"D組の1回目です（4月開講の方向け）。1月16日（土）・17日（日）のどちらか1日にお越しください。2回目は1月30日（土）・31日（日）のどちらか1日（予定）、講座は2027年4月24日（土）からです。"},{"label":"日程","text":"この日程は予定です。決まりしだいご案内します。時間は担当からご案内します。"}]},{"date":"2027-01-23","start":"13:00","end":"14:30","title":"第一期 講座 第1回（開講）","category":"講義","omitted":false,"omitReason":"","check":false,"detail":[{"label":"講義","text":"第一期（1月開講）の第1回です。全6回・いずれも土曜 13:00〜14:30"},{"label":"日程と学ぶこと","text":"項目「講義」の箱を押すと出ます"}]},{"date":"2027-01-30","start":null,"end":null,"title":"受講前オリエンテーション 2回目（第二期の方向け）","category":"オリエン","omitted":false,"omitReason":"","check":false,"detail":[{"label":"組","text":"D組の2回目です（4月開講の方向け。1回目は1月16日（土）・17日（日））。1月30日（土）・31日（日）のどちらか1日にお越しください。講座は2027年4月24日（土）からです。"},{"label":"日程","text":"この日程は予定です。決まりしだいご案内します。時間は担当からご案内します。"}]},{"date":"2027-01-31","start":null,"end":null,"title":"受講前オリエンテーション 2回目（第二期の方向け）","category":"オリエン","omitted":false,"omitReason":"","check":false,"detail":[{"label":"組","text":"D組の2回目です（4月開講の方向け。1回目は1月16日（土）・17日（日））。1月30日（土）・31日（日）のどちらか1日にお越しください。講座は2027年4月24日（土）からです。"},{"label":"日程","text":"この日程は予定です。決まりしだいご案内します。時間は担当からご案内します。"}]}];
+const CATEGORY_INFO = {"オリエン":{"detail":[{"label":"対象","text":"くらしのデジタル安全講習【基礎編】（スマートライフデザイン学入門 現代の読み書き編）を受講される方"},{"label":"流れ","text":"講座が始まる前に、2回のオリエンテーションで準備をします。1回目は「いまの状態を書き出す」回、2回目は「新しい機器を使い始める」回です。必ず 1回目 → 2回目 → 講座 の順番でご参加ください。"},{"label":"1回目（約70分）","text":"教科書（P.1〜5）を一緒に読み、ご自身とご家庭の「いま」を書き出します。いまお使いの機器とインターネットの環境／消えては困るデータ（写真・連絡先・メール・年賀状の住所録など）と最後に保存した日／Microsoft・Apple ID・Google・LINEなどのアカウントの一覧／通信費やサブスクなど「使っていないのに払っているもの」はないか。空欄があっても大丈夫です。パスワードを書いた用紙を、会場でお預かりすることはありません。"},{"label":"1回目の持ち物","text":"いまお使いのパソコン・電源コード・ACアダプター／データ保全ユニット／アカウント情報（メールアドレスとそのパスワード）／携帯電話・インターネットのご利用プラン、携帯電話のアカウント、ご家族で契約しているサブスクの明細／筆記用具"},{"label":"1回目と2回目のあいだ","text":"当店で、新しい機器の設定とデータの移行をしておきます。1回目で空欄になったところ（とくにご家族名義の契約や明細）を、ご自宅で確かめておいてください。Wi-Fiのパスワードはルーター本体のシールに書かれていることが多いので、写真を撮っておくと確実です。"},{"label":"2回目（約2時間）","text":"教科書のつづき（P.6〜8）を読み、新しい機器を一緒に整えます。移行の確認／メールの設定（講座に含まれる「@ozzio.jp」のメール）／ウイルス対策（ウイルスバスター）／防犯アプリ（詐欺バスター）／安全ワイヤレス（SSW）／保証の確認／Safety Number（この日はご説明だけ）。設定はご自身で操作していただき、分からなくなったら担当が一緒に進めます。最後にAO校の施設を一緒に回ります。"},{"label":"2回目の持ち物","text":"教科書・履修Toolガイド・安全のしおり／1回目に書き込んだ用紙／会員登録証（メールとウイルス対策の設定に使います）／いまお使いのスマートフォン／筆記用具／（あれば）ルーターのシールの写真"},{"label":"合言葉","text":"開かない・急がない・一人で決めない"},{"label":"会場・お問い合わせ","text":"SMART LIFE AO 茨城つくば校（つくば市学園南3-16-5）029-860-6755　受付時間 10:30〜19:00（毎週水曜定休日）"}]},"生成AI体験会":{"detail":[]},"安全講習（拠点開催）":{"detail":[]},"講座":{"detail":[]},"LearningBOX":{"detail":[{"label":"どんなもの","text":"全6回の講義＋教材と機器がひとつになった「Learning BOX」。くらしのデジタル安全講習【基礎編】を受けるためのセットです"},{"label":"受講の流れ","text":"① お申込み（Learning BOX）\n② 受講前オリエンテーション（2回）\n③ 講義（全6回）"},{"label":"お申込み","text":"1月開講：2026年10月31日（土）まで\n4月開講：2026年12月19日（土）まで\n先着順・定員になり次第締切"},{"label":"選べる機器","text":"パソコン（Windows・Mac）・iPad\n設定とデータの引っ越しは当店で行います"},{"label":"含まれるもの","text":"・Learning BOX（教科書・履修Toolガイド・安全のしおり・SLパスポートなど12点）\n・新しい機器と、使い始めの設定・データの引っ越し\n・ウイルス対策・詐欺対策アプリと安全ワイヤレス\n・機器の保証（故障・水濡れ・破損・紛失盗難）\n・個別活用支援（毎月1回・要事前予約）\n・AO校「学びの空間」を1年間（オンライン学習室・図書室など）\n・ご家族も使えるチケット（Club Lounge ご利用券3枚／入門・紹介編 受講券2枚／パソコン処分券1枚）\n※講座・機器によって含まれないものがあります"}]},"講義":{"detail":[{"label":"講座","text":"くらしのデジタル安全講習【基礎編】（スマートライフデザイン学入門 現代の読み書き編）"},{"label":"受講の前に","text":"受講前オリエンテーションを2回受けていただきます。必ず 1回目 → 2回目 → 講義 の順番です"},{"label":"日程（1月開講）","text":"全6回・いずれも土曜 13:00〜14:30","table":{"head":["回","日にち"],"rows":[["第1回","2027年1月23日（土）開講"],["第2回","3月27日（土）"],["第3回","5月22日（土）"],["第4回","7月24日（土）"],["第5回","9月25日（土）"],["第6回","11月27日（土）"]]}},{"label":"4月開講","text":"2027年4月24日（土）開講"},{"label":"第1段階","text":"安全を知り、見える化する\n・講座全体像と安全のしおりを読む\n・ことばを自分の生活に引き寄せる\n・家庭内の機器・記録・契約の見える化\n・前半の振り返りと対話"},{"label":"第2段階","text":"安全・経済・記録を見直す\n・安全面から家庭を見直す\n・経済面から家庭を見直す\n・記録・思い出・引き継ぎを見直す\n・中間の振り返りと対話"},{"label":"第3段階","text":"必要なものを整え、使えるように\n・本当に必要な機能を選ぶ\n・優先順位と実行計画を立てる\n・安全な操作とトラブル対応を学ぶ\n・学びを家族・地域へつなぐ対話"},{"label":"欠席したとき","text":"AO校のオンライン学習室で録画（アーカイブ）をご覧いただけます"},{"label":"個別活用支援","text":"講義のほかに、毎月1回（要事前予約）。疑問の解決や、オリエンテーションでできなかったところを一緒に進められます"}]},"締切":{"detail":[]},"節目":{"detail":[]},"イベント":{"detail":[]}};
 const LINKS = [{"label":"SLMCつくば研究学園BASE共有フォルダ","url":"https://drive.google.com/drive/folders/1Irt-X_5miSL7pIYg00nuGZKdG44W4jgu"},{"label":"learningBOX","url":"https://drive.google.com/drive/folders/1KM36lIhisgO5JjlstVB1gTrfB6byuxPf"}];
 (function () {
   const TAG = {
@@ -848,6 +874,7 @@ const LINKS = [{"label":"SLMCつくば研究学園BASE共有フォルダ","url":
     "安全講習（拠点開催）": ["安全講習", "t-safe"],
     "講座": ["講座", "t-kouza"],
     "LearningBOX": ["LearningBOX", "t-lb"],
+    "講義": ["講義", "t-lec"],
     "締切": ["締切", "t-dead"],
     "節目": ["節目", "t-mile"],
     "イベント": ["イベント", "t-ev"]
@@ -942,6 +969,55 @@ const LINKS = [{"label":"SLMCつくば研究学園BASE共有フォルダ","url":
     }
   }
 
+  // 詳細の行（見出し：本文）。item.table があれば、表（head と rows）も出す
+  function detailList(items) {
+    const ul = document.createElement("ul");
+    ul.className = "modal-detail-list";
+    items.forEach(item => {
+      const li = document.createElement("li");
+      li.className = "modal-detail-item" + (item.table ? " has-table" : "");
+      const lb = document.createElement("span");
+      lb.className = "modal-detail-label";
+      lb.textContent = item.label;
+      li.appendChild(lb);
+      if (item.text) {
+        const tx = document.createElement("span");
+        tx.className = "modal-detail-text";
+        tx.textContent = item.text;
+        li.appendChild(tx);
+      }
+      if (item.table && Array.isArray(item.table.rows)) {
+        const wrap = document.createElement("div");
+        wrap.className = "modal-table-wrap";
+        const tb = document.createElement("table");
+        tb.className = "modal-table";
+        if (Array.isArray(item.table.head)) {
+          const thead = document.createElement("thead");
+          const tr = document.createElement("tr");
+          item.table.head.forEach(h => { const th = document.createElement("th"); th.scope = "col"; th.textContent = h; tr.appendChild(th); });
+          thead.appendChild(tr);
+          tb.appendChild(thead);
+        }
+        const tbody = document.createElement("tbody");
+        item.table.rows.forEach(r => {
+          const tr = document.createElement("tr");
+          r.forEach((c, i) => {
+            const cell = document.createElement(i === 0 ? "th" : "td");
+            if (i === 0) cell.scope = "row";
+            cell.textContent = c;
+            tr.appendChild(cell);
+          });
+          tbody.appendChild(tr);
+        });
+        tb.appendChild(tbody);
+        wrap.appendChild(tb);
+        li.appendChild(wrap);
+      }
+      ul.appendChild(li);
+    });
+    return ul;
+  }
+
   function openEventDetail(e, triggerEl) {
     modalTagWrap.replaceChildren();
     modalBody.replaceChildren();
@@ -1008,22 +1084,7 @@ const LINKS = [{"label":"SLMCつくば研究学園BASE共有フォルダ","url":
     if (e.detail && Array.isArray(e.detail) && e.detail.length > 0) {
       const sec = document.createElement("div");
       sec.className = "modal-section";
-      const ul = document.createElement("ul");
-      ul.className = "modal-detail-list";
-      e.detail.forEach(item => {
-        const li = document.createElement("li");
-        li.className = "modal-detail-item";
-        const lb = document.createElement("span");
-        lb.className = "modal-detail-label";
-        lb.textContent = item.label;
-        const tx = document.createElement("span");
-        tx.className = "modal-detail-text";
-        tx.textContent = item.text;
-        li.appendChild(lb);
-        li.appendChild(tx);
-        ul.appendChild(li);
-      });
-      sec.appendChild(ul);
+      sec.appendChild(detailList(e.detail));
       modalBody.appendChild(sec);
     }
 
@@ -1035,22 +1096,7 @@ const LINKS = [{"label":"SLMCつくば研究学園BASE共有フォルダ","url":
       title.className = "modal-section-title";
       title.textContent = "社内向け";
       sec.appendChild(title);
-      const ul = document.createElement("ul");
-      ul.className = "modal-detail-list";
-      e.internal.forEach(item => {
-        const li = document.createElement("li");
-        li.className = "modal-detail-item";
-        const lb = document.createElement("span");
-        lb.className = "modal-detail-label";
-        lb.textContent = item.label;
-        const tx = document.createElement("span");
-        tx.className = "modal-detail-text";
-        tx.textContent = item.text;
-        li.appendChild(lb);
-        li.appendChild(tx);
-        ul.appendChild(li);
-      });
-      sec.appendChild(ul);
+      sec.appendChild(detailList(e.internal));
       modalBody.appendChild(sec);
     }
 
@@ -1134,22 +1180,7 @@ const LINKS = [{"label":"SLMCつくば研究学園BASE共有フォルダ","url":
     if (catInfo && catInfo.detail && Array.isArray(catInfo.detail) && catInfo.detail.length > 0) {
       const sec = document.createElement("div");
       sec.className = "modal-section";
-      const ul = document.createElement("ul");
-      ul.className = "modal-detail-list";
-      catInfo.detail.forEach(item => {
-        const li = document.createElement("li");
-        li.className = "modal-detail-item";
-        const lb = document.createElement("span");
-        lb.className = "modal-detail-label";
-        lb.textContent = item.label;
-        const tx = document.createElement("span");
-        tx.className = "modal-detail-text";
-        tx.textContent = item.text;
-        li.appendChild(lb);
-        li.appendChild(tx);
-        ul.appendChild(li);
-      });
-      sec.appendChild(ul);
+      sec.appendChild(detailList(catInfo.detail));
       modalBody.appendChild(sec);
     }
 
@@ -1161,22 +1192,7 @@ const LINKS = [{"label":"SLMCつくば研究学園BASE共有フォルダ","url":
       title.className = "modal-section-title";
       title.textContent = "社内向け";
       sec.appendChild(title);
-      const ul = document.createElement("ul");
-      ul.className = "modal-detail-list";
-      catInfo.internal.forEach(item => {
-        const li = document.createElement("li");
-        li.className = "modal-detail-item";
-        const lb = document.createElement("span");
-        lb.className = "modal-detail-label";
-        lb.textContent = item.label;
-        const tx = document.createElement("span");
-        tx.className = "modal-detail-text";
-        tx.textContent = item.text;
-        li.appendChild(lb);
-        li.appendChild(tx);
-        ul.appendChild(li);
-      });
-      sec.appendChild(ul);
+      sec.appendChild(detailList(catInfo.internal));
       modalBody.appendChild(sec);
     }
 
@@ -1269,7 +1285,9 @@ const LINKS = [{"label":"SLMCつくば研究学園BASE共有フォルダ","url":
 
   // 項目ごとの次の日程（今日以降・やめていないもの）を箱で並べる
   const nbGrid = document.getElementById("nbGrid");
-  Object.keys(TAG).forEach(cat => {
+  // くらしのデジタル安全講習【基礎編】の受講の順番。この3つは流れとして先に並べ、残りの項目はその下に並べる
+  const FLOW = [["LearningBOX", "STEP 1　申込"], ["オリエン", "STEP 2　受講前オリエン（2回）"], ["講義", "STEP 3　講義（全6回）"]];
+  function makeBox(cat, step) {
     const upcoming = evs.filter(e => e.category === cat && e.date >= today && !e.omitted);
     const box = document.createElement("button");
     box.type = "button";
@@ -1277,6 +1295,7 @@ const LINKS = [{"label":"SLMCつくば研究学園BASE共有フォルダ","url":
     box.addEventListener("click", () => {
       openCategoryDetail(cat, box);
     });
+    if (step) { const st = document.createElement("div"); st.className = "nb-step"; st.textContent = step; box.appendChild(st); }
     const [label, cls] = TAG[cat];
     const tag = document.createElement("span"); tag.className = "tag " + cls; tag.textContent = label; box.appendChild(tag);
     const dt = document.createElement("div"); dt.className = "nb-date";
@@ -1297,8 +1316,18 @@ const LINKS = [{"label":"SLMCつくば研究学園BASE共有フォルダ","url":
       sub.textContent = (days === 0 ? "今日" : days === 1 ? "明日" : "あと" + days + "日") + "　／　この先 " + upcoming.length + "件";
       box.appendChild(sub);
     }
-    nbGrid.appendChild(box);
+    return box;
+  }
+  const flowEl = document.getElementById("flow");
+  const flowTitle = document.createElement("div");
+  flowTitle.className = "flow-title";
+  flowTitle.textContent = "くらしのデジタル安全講習【基礎編】の流れ";
+  flowEl.appendChild(flowTitle);
+  FLOW.forEach(([cat, step], i) => {
+    if (i > 0) { const ar = document.createElement("div"); ar.className = "flow-arrow"; ar.setAttribute("aria-hidden", "true"); ar.textContent = "→"; flowEl.appendChild(ar); }
+    flowEl.appendChild(makeBox(cat, step));
   });
+  Object.keys(TAG).filter(cat => !FLOW.some(([c]) => c === cat)).forEach(cat => nbGrid.appendChild(makeBox(cat)));
 
   const byMonth = new Map();
   evs.forEach(e => {
